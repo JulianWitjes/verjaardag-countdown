@@ -10,7 +10,7 @@ body {
   justify-content: center;
 }
 
-/* Kaart */
+/* Container */
 .container {
   background: #ff6f61;
   padding: 24px;
@@ -21,7 +21,7 @@ body {
   text-align: center;
 }
 
-/* Typografie */
+/* Tekst */
 h1 {
   font-size: 2.5em;
   margin-bottom: 20px;
@@ -37,7 +37,7 @@ h1 {
   font-weight: bold;
 }
 
-/* Input en knop */
+/* Input en knoppen */
 input[type="date"] {
   padding: 10px;
   border-radius: 8px;
