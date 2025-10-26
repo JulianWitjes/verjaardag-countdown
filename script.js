@@ -1,18 +1,15 @@
-// === Verjaardag instellen ===
-// Pas deze twee waarden aan naar jouw verjaardag
-const MONTH = 6; // 1 = januari, 6 = juni, 12 = december
-const DAY = 18;  // dag in de maand
+let birthdayDate = null;
 
 function updateCountdown() {
-  const now = new Date();
-  const year = now.getFullYear();
+  if (!birthdayDate) return; // Niets doen als geen datum ingesteld
 
-  // Verjaardag dit jaar
-  let birthday = new Date(year, MONTH - 1, DAY, 0, 0, 0, 0);
+  const now = new Date();
+  let birthday = new Date(birthdayDate);
 
   // Als verjaardag al geweest is, pak volgend jaar
+  birthday.setFullYear(now.getFullYear());
   if (birthday < now) {
-    birthday = new Date(year + 1, MONTH - 1, DAY, 0, 0, 0, 0);
+    birthday.setFullYear(now.getFullYear() + 1);
   }
 
   const distance = birthday - now;
@@ -34,13 +31,22 @@ function updateCountdown() {
 
 // Start wanneer de DOM klaar is
 document.addEventListener("DOMContentLoaded", () => {
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
-});
+  // Button listener
+  document.getElementById("setBirthdayBtn").addEventListener("click", () => {
+    const input = document.getElementById("birthdayInput").value;
+    if (input) {
+      birthdayDate = input;
+      updateCountdown();
+    }
+  });
 
-// Service Worker alleen hier registreren
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("./sw.js")
-    .then(() => console.log("Service Worker geregistreerd"))
-    .catch(err => console.log("Service Worker fout", err));
-}
+  // Update elke seconde
+  setInterval(updateCountdown, 1000);
+
+  // Service Worker registreren
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js")
+      .then(() => console.log("Service Worker geregistreerd"))
+      .catch(err => console.log("Service Worker fout", err));
+  }
+});
