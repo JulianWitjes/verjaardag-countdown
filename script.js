@@ -7,7 +7,6 @@ function updateCountdown() {
   const now = new Date();
   let birthday = new Date(birthdayDate);
 
-  // Als verjaardag al geweest is, pak volgend jaar
   birthday.setFullYear(now.getFullYear());
   if (birthday < now) {
     birthday.setFullYear(now.getFullYear() + 1);
@@ -35,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("birthdayInput");
   const installBtn = document.getElementById("installBtn");
 
-  // Datum instellen
+  // Verjaardag instellen
   setBtn.addEventListener("click", () => {
     if (input.value) {
       birthdayDate = input.value;
@@ -43,34 +42,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Update countdown elke seconde
+  // Update elke seconde
   setInterval(updateCountdown, 1000);
 
-  // Service Worker registreren
+  // Service worker registreren
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js")
       .then(() => console.log("Service Worker geregistreerd"))
       .catch(err => console.log("Service Worker fout", err));
   }
 
-  // Installatie prompt event (Chrome/Edge)
+  // Installatie prompt
   window.addEventListener("beforeinstallprompt", (e) => {
-    console.log("beforeinstallprompt event fired!");
-    e.preventDefault(); // voorkom automatische prompt
+    console.log("✅ beforeinstallprompt event fired");
+    e.preventDefault();
     deferredPrompt = e;
   });
 
-  // Installatieknop altijd zichtbaar
+  // Installatieknop
   installBtn.addEventListener("click", async () => {
     if (deferredPrompt) {
-      // Chrome/Edge: toon officiële prompt
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       deferredPrompt = null;
-      console.log(outcome === "accepted" ? "App geïnstalleerd!" : "Installatie geweigerd");
+      console.log(outcome === "accepted" ? "✅ App geïnstalleerd!" : "❌ Installatie geweigerd");
     } else {
-      // App nog niet installable of iOS: instructie tonen
-      alert("De app kan nu nog niet automatisch geïnstalleerd worden.\nOp iOS gebruik: 'Delen' → 'Zet op beginscherm'.\nOp Chrome/Edge, herlaad de pagina en probeer opnieuw.");
+      alert("Chrome ziet de app nog niet als installable.\nControleer via F12 → Application → Manifest → Installable: Yes.");
     }
   });
 });
