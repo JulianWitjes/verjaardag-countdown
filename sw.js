@@ -27,11 +27,8 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   const req = event.request;
-
-  // Alleen GET cachen
   if (req.method !== "GET") return;
 
-  // Cache-first voor assets
   event.respondWith(
     caches.match(req).then(cached =>
       cached ||
