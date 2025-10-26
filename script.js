@@ -1,7 +1,8 @@
 let birthdayDate = null;
+let deferredPrompt = null;
 
 function updateCountdown() {
-  if (!birthdayDate) return; // Niets doen als geen datum ingesteld
+  if (!birthdayDate) return;
 
   const now = new Date();
   let birthday = new Date(birthdayDate);
@@ -29,18 +30,20 @@ function updateCountdown() {
   }
 }
 
-// Start wanneer de DOM klaar is
 document.addEventListener("DOMContentLoaded", () => {
-  // Button listener
-  document.getElementById("setBirthdayBtn").addEventListener("click", () => {
-    const input = document.getElementById("birthdayInput").value;
-    if (input) {
-      birthdayDate = input;
+  const setBtn = document.getElementById("setBirthdayBtn");
+  const input = document.getElementById("birthdayInput");
+  const installBtn = document.getElementById("installBtn");
+
+  // Datum instellen
+  setBtn.addEventListener("click", () => {
+    if (input.value) {
+      birthdayDate = input.value;
       updateCountdown();
     }
   });
 
-  // Update elke seconde
+  // Update countdown elke seconde
   setInterval(updateCountdown, 1000);
 
   // Service Worker registreren
@@ -49,4 +52,24 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(() => console.log("Service Worker geregistreerd"))
       .catch(err => console.log("Service Worker fout", err));
   }
+
+  // PWA installatie prompt
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // knop zichtbaar (altijd zichtbaar sowieso)
+  });
+
+  installBtn.addEventListener("click", async () => {
+    if (deferredPrompt) {
+      // Chrome/Android: toon officiële prompt
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      console.log(outcome === "accepted" ? "App geïnstalleerd!" : "Installatie geweigerd");
+    } else {
+      // iOS: instructie tonen
+      alert("Op iOS: gebruik de 'Delen'-knop en kies 'Zet op beginscherm' om de app te installeren.");
+    }
+  });
 });
