@@ -53,23 +53,24 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch(err => console.log("Service Worker fout", err));
   }
 
-  // PWA installatie prompt
+  // Installatie prompt event (Chrome/Edge)
   window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
+    console.log("beforeinstallprompt event fired!");
+    e.preventDefault(); // voorkom automatische prompt
     deferredPrompt = e;
-    // knop zichtbaar (altijd zichtbaar sowieso)
   });
 
+  // Installatieknop altijd zichtbaar
   installBtn.addEventListener("click", async () => {
     if (deferredPrompt) {
-      // Chrome/Android: toon officiële prompt
+      // Chrome/Edge: toon officiële prompt
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       deferredPrompt = null;
       console.log(outcome === "accepted" ? "App geïnstalleerd!" : "Installatie geweigerd");
     } else {
-      // iOS: instructie tonen
-      alert("Op iOS: gebruik de 'Delen'-knop en kies 'Zet op beginscherm' om de app te installeren.");
+      // App nog niet installable of iOS: instructie tonen
+      alert("De app kan nu nog niet automatisch geïnstalleerd worden.\nOp iOS gebruik: 'Delen' → 'Zet op beginscherm'.\nOp Chrome/Edge, herlaad de pagina en probeer opnieuw.");
     }
   });
 });
